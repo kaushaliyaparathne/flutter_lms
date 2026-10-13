@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/screens/login_screen.dart';
+import 'routes/app_routes.dart';
 
 void main() => runApp(const MyApp());
 
@@ -13,7 +13,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter LMS',
       theme: AppTheme.light,
-      home: const LoginScreen(),
+      initialRoute: AppRoutes.login,
+      routes: AppRoutes.routes,
     );
   }
 }
