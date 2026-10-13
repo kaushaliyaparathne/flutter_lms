@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Flutter LMS',
       theme: AppTheme.light,
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.onboarding,
       routes: AppRoutes.routes,
     );
   }
