@@ -1,6 +1,7 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_lms/features/home/screens/home_screen.dart';
+import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/primary_button.dart';
+import '../../../routes/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -13,7 +14,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
   bool _obscurePassword = true;
 
   @override
@@ -24,17 +24,13 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   String? _validateEmail(String? value) {
-    final email = value?.trim() ?? '';
-
-    if (email.isEmpty) {
+    if (value == null || value.trim().isEmpty) {
       return 'Email is required';
     }
-
-    if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$')
-        .hasMatch(email)) {
-      return 'Please enter a valid email address';
+    final regex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+    if (!regex.hasMatch(value.trim())) {
+      return 'Enter a valid email address';
     }
-
     return null;
   }
 
@@ -42,30 +38,23 @@ class _LoginScreenState extends State<LoginScreen> {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
-
-    if (value.length < 6) {
-      return 'Password must be at least 6 characters';
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
     }
-
     return null;
   }
 
+  // Temporary local logic. Replaced by the real API on Day 5.
+  void _login() {
+    if (!_formKey.currentState!.validate()) return;
 
-void _login() {
-  FocusScope.of(context).unfocus();
+    final email = _emailController.text.trim().toLowerCase();
+    String route = AppRoutes.student;
+    if (email.startsWith('instructor')) route = AppRoutes.instructor;
+    if (email.startsWith('admin')) route = AppRoutes.admin;
 
-  if (!_formKey.currentState!.validate()) {
-    return;
+    Navigator.pushReplacementNamed(context, route);
   }
-
-  Navigator.pushReplacement(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const HomeScreen(),
-    ),
-  );
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -79,82 +68,38 @@ void _login() {
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    const Icon(
-                      Icons.school,
-                      size: 80,
-                      color: Colors.indigo,
-                    ),
+                    const Icon(Icons.school, size: 80, color: Colors.indigo),
                     const SizedBox(height: 16),
-                    Text(
-                      'Welcome to LMS',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context)
-                          .textTheme
-                          .headlineSmall
-                          ?.copyWith(fontWeight: FontWeight.bold),
-                    ),
+                    Text('Welcome to LMS',
+                        style: Theme.of(context).textTheme.headlineMedium),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Login to continue',
-                      textAlign: TextAlign.center,
-                    ),
+                    const Text('Login to continue'),
                     const SizedBox(height: 32),
-
-                    TextFormField(
+                    AppTextField(
                       controller: _emailController,
+                      label: 'Email',
+                      prefixIcon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
-                      textInputAction: TextInputAction.next,
-                      autovalidateMode:
-                          AutovalidateMode.onUserInteraction,
                       validator: _validateEmail,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        prefixIcon: Icon(Icons.email_outlined),
-                        border: OutlineInputBorder(),
-                      ),
                     ),
                     const SizedBox(height: 16),
-
-                    TextFormField(
+                    AppTextField(
                       controller: _passwordController,
+                      label: 'Password',
+                      prefixIcon: Icons.lock_outline,
                       obscureText: _obscurePassword,
-                      textInputAction: TextInputAction.done,
-                      autovalidateMode:
-                          AutovalidateMode.onUserInteraction,
                       validator: _validatePassword,
-                      onFieldSubmitted: (_) => _login(),
-                      decoration: InputDecoration(
-                        labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        border: const OutlineInputBorder(),
-                        suffixIcon: IconButton(
-                          tooltip: _obscurePassword
-                              ? 'Show password'
-                              : 'Hide password',
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off
-                                : Icons.visibility,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     const SizedBox(height: 24),
-
-                    SizedBox(
-                      height: 48,
-                      child: ElevatedButton(
-                        onPressed: _login,
-                        child: const Text('Login'),
-                      ),
-                    ),
+                    PrimaryButton(text: 'Login', onPressed: _login),
                   ],
                 ),
               ),
