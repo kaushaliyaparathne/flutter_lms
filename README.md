@@ -7,7 +7,7 @@ A Flutter Learning Management System (LMS) mobile application with three role-ba
 Work in progress (10-day implementation plan).
 
 - [x] Day 1: Project setup and Login UI
-- [ ] Day 2: Navigation, forms, validation, theme
+- [x ] Day 2: Navigation, forms, validation, theme
 - [ ] Day 3: Splash, onboarding, role dashboards
 - [ ] Day 4: Docker backend and core API setup
 - [ ] Day 5: Authentication and profiles
