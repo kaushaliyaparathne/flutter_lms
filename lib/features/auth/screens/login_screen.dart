@@ -69,7 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    const Icon(Icons.school, size: 80, color: Colors.indigo),
+                    Image.asset('assets/images/logo.jpg', height: 80),
                     const SizedBox(height: 16),
                     Text('Welcome to LMS',
                         style: Theme.of(context).textTheme.headlineMedium),
