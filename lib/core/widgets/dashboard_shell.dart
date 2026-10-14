@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../routes/app_routes.dart';
 import 'section_header.dart';
-import 'summary_card.dart';
-
-class DashboardItem {
-  final IconData icon;
-  final String label;
-  final String value;
-  const DashboardItem(this.icon, this.label, this.value);
-}
+import 'summary_grid.dart';
 
 class DashboardShell extends StatelessWidget {
   final String title;
   final String greeting;
-  final List<DashboardItem> summary;
+  final List<SummaryGridItem> summary;
   final String sectionTitle;
   final List<String> shortcuts;
+  final List<String> recentActivity;
 
   const DashboardShell({
     super.key,
@@ -24,6 +18,7 @@ class DashboardShell extends StatelessWidget {
     required this.summary,
     required this.sectionTitle,
     required this.shortcuts,
+    this.recentActivity = const [],
   });
 
   @override
@@ -34,6 +29,7 @@ class DashboardShell extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
             onPressed: () =>
                 Navigator.pushReplacementNamed(context, AppRoutes.login),
           ),
@@ -44,18 +40,7 @@ class DashboardShell extends StatelessWidget {
         children: [
           Text(greeting, style: Theme.of(context).textTheme.headlineMedium),
           const SizedBox(height: 16),
-          GridView.count(
-            crossAxisCount: 2,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisSpacing: 12,
-            mainAxisSpacing: 12,
-            childAspectRatio: 1.4,
-            children: [
-              for (final s in summary)
-                SummaryCard(icon: s.icon, label: s.label, value: s.value),
-            ],
-          ),
+          SummaryGrid(items: summary),
           const SizedBox(height: 16),
           SectionHeader(title: sectionTitle),
           for (final s in shortcuts)
@@ -66,6 +51,17 @@ class DashboardShell extends StatelessWidget {
                 onTap: () {},
               ),
             ),
+          if (recentActivity.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            const SectionHeader(title: 'Recent Activity'),
+            for (final a in recentActivity)
+              Card(
+                child: ListTile(
+                  leading: const Icon(Icons.history, color: Colors.indigo),
+                  title: Text(a),
+                ),
+              ),
+          ],
         ],
       ),
     );

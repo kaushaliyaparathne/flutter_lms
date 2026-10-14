@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/dashboard_shell.dart';
+import '../../../core/widgets/summary_grid.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -10,13 +11,18 @@ class AdminDashboard extends StatelessWidget {
       title: 'Admin Dashboard',
       greeting: 'Hello, Admin',
       summary: [
-        DashboardItem(Icons.people_outline, 'Users', '250'),
-        DashboardItem(Icons.category_outlined, 'Categories', '12'),
-        DashboardItem(Icons.library_books_outlined, 'Courses', '40'),
-        DashboardItem(Icons.reviews_outlined, 'Reviews', '75'),
+        SummaryGridItem(Icons.people_outline, 'Users', '250'),
+        SummaryGridItem(Icons.category_outlined, 'Categories', '12'),
+        SummaryGridItem(Icons.library_books_outlined, 'Courses', '40'),
+        SummaryGridItem(Icons.reviews_outlined, 'Reviews', '75'),
       ],
       sectionTitle: 'Management Shortcuts',
       shortcuts: ['Manage Users', 'Manage Categories', 'Moderate Reviews'],
+      recentActivity: [
+        'New user registered',
+        'New review submitted',
+        'Course published by an instructor',
+      ],
     );
   }
 }
