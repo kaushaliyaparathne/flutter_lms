@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/auth_header.dart';
 import '../../../core/widgets/primary_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -38,7 +39,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Forgot Password')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -49,13 +49,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    const Icon(Icons.lock_reset, size: 80, color: Colors.indigo),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'Enter your email and we will send you a verification code.',
-                      textAlign: TextAlign.center,
+                    const AuthHeader(
+                      title: 'Forgot Password?',
+                      subtitle:
+                          'Enter your email and we will send you a verification code',
                     ),
-                    const SizedBox(height: 24),
                     AppTextField(
                       controller: _email,
                       label: 'Email',
@@ -65,10 +63,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     ),
                     const SizedBox(height: 24),
                     PrimaryButton(text: 'Send code', onPressed: _sendOtp),
-                    const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Back to login'),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        const Text('Remember your password?'),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Back to login'),
+                        ),
+                      ],
                     ),
                   ],
                 ),

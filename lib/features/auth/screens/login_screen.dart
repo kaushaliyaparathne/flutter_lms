@@ -102,15 +102,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         Checkbox(
                           value: _rememberMe,
+                          visualDensity: VisualDensity.compact,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
                           onChanged: (v) =>
                               setState(() => _rememberMe = v ?? false),
                         ),
-                        const Flexible(child: Text('Remember me')),
-                        const Spacer(),
+                        const Expanded(
+                          child: Text(
+                            'Remember me',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                         TextButton(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 8),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
                           onPressed: () => Navigator.pushNamed(
                               context, AppRoutes.forgotPassword),
-                          child: const Text('Forgot password?'),
+                          child: const Text(
+                            'Forgot password?',
+                            maxLines: 1,
+                          ),
                         ),
                       ],
                     ),

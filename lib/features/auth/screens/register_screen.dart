@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/widgets/auth_header.dart';
 import '../../../core/widgets/primary_button.dart';
 
 enum RegisterRole { student, instructor }
@@ -19,7 +20,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _password = TextEditingController();
   final _confirm = TextEditingController();
   RegisterRole _role = RegisterRole.student;
-  bool _obscure = true;
+  bool _obscurePassword = true;
+  bool _obscureConfirm = true;
 
   @override
   void dispose() {
@@ -42,10 +44,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return null;
   }
 
-  // Rules seen from the backend validation messages.
+  // Rules taken from the backend validation messages.
   String? _validatePassword(String? v) {
     if (v == null || v.isEmpty) return 'Password is required';
     if (v.length < 8) return 'At least 8 characters';
+    if (!RegExp(r'[A-Z]').hasMatch(v)) return 'Must contain an uppercase letter';
+    if (!RegExp(r'[a-z]').hasMatch(v)) return 'Must contain a lowercase letter';
     if (!RegExp(r'[0-9]').hasMatch(v)) return 'Must contain a number';
     if (!RegExp(r'[^A-Za-z0-9]').hasMatch(v)) {
       return 'Must contain a special character';
@@ -53,8 +57,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
     return null;
   }
 
-  String? _validateConfirm(String? v) =>
-      v != _password.text ? 'Passwords do not match' : null;
+  String? _validateConfirm(String? v) {
+    if (v == null || v.isEmpty) return 'Confirm your password';
+    if (v != _password.text) return 'Passwords do not match';
+    return null;
+  }
 
   // Temporary. Replaced by the real API on Day 5.
   void _register() {
@@ -68,7 +75,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Create Account')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -79,34 +85,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 key: _formKey,
                 child: Column(
                   children: [
-                    SegmentedButton<RegisterRole>(
-                      segments: const [
-                        ButtonSegment(
+                    const AuthHeader(
+                      title: 'Create Account',
+                      subtitle: 'Register to start learning',
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: SegmentedButton<RegisterRole>(
+                        segments: const [
+                          ButtonSegment(
                             value: RegisterRole.student,
                             label: Text('Student'),
-                            icon: Icon(Icons.school_outlined)),
-                        ButtonSegment(
+                            icon: Icon(Icons.school_outlined),
+                          ),
+                          ButtonSegment(
                             value: RegisterRole.instructor,
                             label: Text('Instructor'),
-                            icon: Icon(Icons.person_outline)),
-                      ],
-                      selected: {_role},
-                      onSelectionChanged: (s) =>
-                          setState(() => _role = s.first),
+                            icon: Icon(Icons.person_outline),
+                          ),
+                        ],
+                        selected: {_role},
+                        onSelectionChanged: (s) =>
+                            setState(() => _role = s.first),
+                      ),
                     ),
                     const SizedBox(height: 24),
-                    AppTextField(
-                      controller: _firstName,
-                      label: 'First name',
-                      prefixIcon: Icons.person_outline,
-                      validator: (v) => _required(v, 'First name'),
-                    ),
-                    const SizedBox(height: 16),
-                    AppTextField(
-                      controller: _lastName,
-                      label: 'Last name',
-                      prefixIcon: Icons.person_outline,
-                      validator: (v) => _required(v, 'Last name'),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: AppTextField(
+                            controller: _firstName,
+                            label: 'First name',
+                            prefixIcon: Icons.person_outline,
+                            validator: (v) => _required(v, 'Required'),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: AppTextField(
+                            controller: _lastName,
+                            label: 'Last name',
+                            validator: (v) => _required(v, 'Required'),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 16),
                     AppTextField(
@@ -121,13 +144,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _password,
                       label: 'Password',
                       prefixIcon: Icons.lock_outline,
-                      obscureText: _obscure,
+                      obscureText: _obscurePassword,
                       validator: _validatePassword,
                       suffixIcon: IconButton(
-                        icon: Icon(_obscure
+                        icon: Icon(_obscurePassword
                             ? Icons.visibility_off
                             : Icons.visibility),
-                        onPressed: () => setState(() => _obscure = !_obscure),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -135,15 +159,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       controller: _confirm,
                       label: 'Confirm password',
                       prefixIcon: Icons.lock_outline,
-                      obscureText: _obscure,
+                      obscureText: _obscureConfirm,
                       validator: _validateConfirm,
+                      suffixIcon: IconButton(
+                        icon: Icon(_obscureConfirm
+                            ? Icons.visibility_off
+                            : Icons.visibility),
+                        onPressed: () => setState(
+                            () => _obscureConfirm = !_obscureConfirm),
+                      ),
                     ),
                     const SizedBox(height: 24),
                     PrimaryButton(text: 'Register', onPressed: _register),
-                    const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Already have an account? Login'),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        const Text('Already have an account?'),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Login'),
+                        ),
+                      ],
                     ),
                   ],
                 ),
