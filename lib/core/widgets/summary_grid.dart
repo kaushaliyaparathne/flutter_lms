@@ -5,7 +5,9 @@ class SummaryGridItem {
   final IconData icon;
   final String label;
   final String value;
-  const SummaryGridItem(this.icon, this.label, this.value);
+  final Color color;
+  const SummaryGridItem(this.icon, this.label, this.value,
+      [this.color = Colors.indigo]);
 }
 
 class SummaryGrid extends StatelessWidget {
@@ -20,10 +22,11 @@ class SummaryGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1.15,
+      childAspectRatio: 1.25,
       children: [
         for (final i in items)
-          SummaryCard(icon: i.icon, label: i.label, value: i.value),
+          SummaryCard(
+              icon: i.icon, label: i.label, value: i.value, color: i.color),
       ],
     );
   }
