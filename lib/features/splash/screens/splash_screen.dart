@@ -29,11 +29,13 @@ class _SplashScreenState extends State<SplashScreen> {
               'assets/images/logo.png',
               height: 100,
               errorBuilder: (context, error, stackTrace) =>
-    const Icon(Icons.school, size: 100, color: Colors.indigo),
+                  const Icon(Icons.school, size: 100, color: Colors.indigo),
             ),
             const SizedBox(height: 16),
-            Text('Flutter LMS',
-                style: Theme.of(context).textTheme.headlineMedium),
+            Text(
+              'Flutter LMS',
+              style: Theme.of(context).textTheme.headlineMedium,
+            ),
             const SizedBox(height: 24),
             const CircularProgressIndicator(),
           ],

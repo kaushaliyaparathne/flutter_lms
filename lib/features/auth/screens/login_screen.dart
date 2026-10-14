@@ -15,6 +15,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -24,23 +25,15 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
-    }
+    if (value == null || value.trim().isEmpty) return 'Email is required';
     final regex = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
-    if (!regex.hasMatch(value.trim())) {
-      return 'Enter a valid email address';
-    }
+    if (!regex.hasMatch(value.trim())) return 'Enter a valid email address';
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Password is required';
-    }
-    if (value.length < 8) {
-      return 'Password must be at least 8 characters';
-    }
+    if (value == null || value.isEmpty) return 'Password is required';
+    if (value.length < 8) return 'Password must be at least 8 characters';
     return null;
   }
 
@@ -72,11 +65,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     Image.asset(
                       'assets/images/logo.png',
                       height: 80,
-                      errorBuilder: (context, error, stackTrace) => const Icon(
-                        Icons.school,
-                        size: 80,
-                        color: Colors.indigo,
-                      ),
+                      errorBuilder: (context, error, stackTrace) =>
+                          const Icon(Icons.school,
+                              size: 80, color: Colors.indigo),
                     ),
                     const SizedBox(height: 16),
                     Text('Welcome to LMS',
@@ -106,8 +97,38 @@ class _LoginScreenState extends State<LoginScreen> {
                             () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _rememberMe,
+                          onChanged: (v) =>
+                              setState(() => _rememberMe = v ?? false),
+                        ),
+                        const Flexible(child: Text('Remember me')),
+                        const Spacer(),
+                        TextButton(
+                          onPressed: () => Navigator.pushNamed(
+                              context, AppRoutes.forgotPassword),
+                          child: const Text('Forgot password?'),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                     PrimaryButton(text: 'Login', onPressed: _login),
+                    const SizedBox(height: 16),
+                    Wrap(
+                      alignment: WrapAlignment.center,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      children: [
+                        const Text("Don't have an account?"),
+                        TextButton(
+                          onPressed: () =>
+                              Navigator.pushNamed(context, AppRoutes.register),
+                          child: const Text('Register'),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               ),
