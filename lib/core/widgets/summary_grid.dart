@@ -20,7 +20,7 @@ class SummaryGrid extends StatelessWidget {
       physics: const NeverScrollableScrollPhysics(),
       crossAxisSpacing: 12,
       mainAxisSpacing: 12,
-      childAspectRatio: 1.4,
+      childAspectRatio: 1.15,
       children: [
         for (final i in items)
           SummaryCard(icon: i.icon, label: i.label, value: i.value),

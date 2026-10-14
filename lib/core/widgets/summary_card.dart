@@ -15,14 +15,21 @@ class SummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Icon(icon, color: Colors.indigo),
-            const Spacer(),
-            Text(value, style: Theme.of(context).textTheme.headlineMedium),
-            Text(label),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                value,
+                style: Theme.of(context).textTheme.headlineMedium,
+              ),
+            ),
+            Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
           ],
         ),
       ),
