@@ -79,23 +79,23 @@ class ApiClient {
   }
 
   Future<bool> _refreshTokens() async {
-    final refresh = await tokenStorage.refreshToken;
-    if (refresh == null || refresh.isEmpty) return false;
-    try {
-      final res = await _refreshDio.post(
-        '/api/v1/auth/refresh-token',
-        data: {'refreshToken': refresh},
-      );
-      final data = res.data['data'] as Map<String, dynamic>;
-      await tokenStorage.saveSession(
-        accessToken: data['accessToken'] as String,
-        refreshToken: data['refreshToken'] as String,
-      );
-      return true;
-    } catch (_) {
-      return false;
-    }
+  final refresh = await tokenStorage.refreshToken;
+  if (refresh == null || refresh.isEmpty) return false;
+  try {
+    final res = await _refreshDio.post(
+      '/api/v1/auth/refresh-token',
+      data: {'refreshToken': refresh},
+    );
+    final tokens = res.data['data']['tokens'] as Map<String, dynamic>;
+    await tokenStorage.saveSession(
+      accessToken: tokens['accessToken'] as String,
+      refreshToken: tokens['refreshToken'] as String,
+    );
+    return true;
+  } catch (_) {
+    return false;
   }
+}
 
   static ApiException toException(Object e) =>
       e is DioException ? ApiException.fromDio(e) : ApiException('$e');
