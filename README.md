@@ -8,7 +8,7 @@ Work in progress (10-day implementation plan).
 
 - [x] Day 1: Project setup and Login UI
 - [x ] Day 2: Navigation, forms, validation, theme
-- [ ] Day 3: Splash, onboarding, role dashboards
+- [x ] Day 3: Splash, onboarding, role dashboards
 - [ ] Day 4: Docker backend and core API setup
 - [ ] Day 5: Authentication and profiles
 - [ ] Day 6: Courses, enrollment, lessons, progress
