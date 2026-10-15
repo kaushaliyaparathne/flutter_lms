@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/network/api_client.dart';
 import '../../../core/widgets/app_text_field.dart';
 import '../../../core/widgets/primary_button.dart';
 import '../../../routes/app_routes.dart';
@@ -14,8 +15,10 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -33,20 +36,64 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) return 'Password is required';
-    if (value.length < 8) return 'Password must be at least 8 characters';
     return null;
   }
 
-  // Temporary local logic. Replaced by the real API on Day 5.
-  void _login() {
+  void _showMessage(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message), behavior: SnackBarBehavior.floating),
+    );
+  }
+
+  Future<void> _login() async {
+    if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
-    final email = _emailController.text.trim().toLowerCase();
-    String route = AppRoutes.student;
-    if (email.startsWith('instructor')) route = AppRoutes.instructor;
-    if (email.startsWith('admin')) route = AppRoutes.admin;
+    FocusScope.of(context).unfocus();
+    setState(() => _isLoading = true);
 
-    Navigator.pushReplacementNamed(context, route);
+    try {
+      final response = await ApiClient.instance.dio.post(
+        '/api/v1/auth/login',
+        data: {
+          'email': _emailController.text.trim().toLowerCase(),
+          'password': _passwordController.text,
+        },
+      );
+
+      final data = response.data['data'] as Map<String, dynamic>;
+      final user = data['user'] as Map<String, dynamic>;
+      final tokens = data['tokens'] as Map<String, dynamic>;
+      final role = user['role']?.toString().toUpperCase();
+
+      final destination = switch (role) {
+        'STUDENT' => AppRoutes.student,
+        'INSTRUCTOR' => AppRoutes.instructor,
+        'ADMIN' => AppRoutes.admin,
+        _ => null,
+      };
+
+      if (destination == null) {
+        _showMessage('Your account role is not supported by this app.');
+        return;
+      }
+
+      final storage = ApiClient.instance.tokenStorage;
+      await storage.saveSession(
+        accessToken: tokens['accessToken'] as String,
+        refreshToken: tokens['refreshToken'] as String,
+        role: role,
+      );
+      await storage.setRememberMe(_rememberMe);
+
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, destination);
+    } catch (error) {
+      _showMessage(ApiClient.toException(error).message);
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -109,11 +156,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               setState(() => _rememberMe = v ?? false),
                         ),
                         const Expanded(
-                          child: Text(
-                            'Remember me',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                          child: Text('Remember me',
+                              maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                         TextButton(
                           style: TextButton.styleFrom(
@@ -121,17 +165,20 @@ class _LoginScreenState extends State<LoginScreen> {
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          onPressed: () => Navigator.pushNamed(
-                              context, AppRoutes.forgotPassword),
-                          child: const Text(
-                            'Forgot password?',
-                            maxLines: 1,
-                          ),
+                          onPressed: _isLoading
+                              ? null
+                              : () => Navigator.pushNamed(
+                                  context, AppRoutes.forgotPassword),
+                          child: const Text('Forgot password?', maxLines: 1),
                         ),
                       ],
                     ),
                     const SizedBox(height: 16),
-                    PrimaryButton(text: 'Login', onPressed: _login),
+                    PrimaryButton(
+                      text: 'Login',
+                      isLoading: _isLoading,
+                      onPressed: _login,
+                    ),
                     const SizedBox(height: 16),
                     Wrap(
                       alignment: WrapAlignment.center,
@@ -139,8 +186,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       children: [
                         const Text("Don't have an account?"),
                         TextButton(
-                          onPressed: () =>
-                              Navigator.pushNamed(context, AppRoutes.register),
+                          onPressed: _isLoading
+                              ? null
+                              : () => Navigator.pushNamed(
+                                  context, AppRoutes.register),
                           child: const Text('Register'),
                         ),
                       ],
